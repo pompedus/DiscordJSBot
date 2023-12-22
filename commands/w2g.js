@@ -31,8 +31,8 @@ module.exports = {
             console.log(new Date().toLocaleString() + ": " + "User " + interaction.user.username + " used command " + interaction.commandName + " and sent a video successfully!")
         })
         .catch(async error => {
-        	await interaction.reply({content:"Något har gått fel!\n Felmeddelandet är: **" + error.toString() + "**", ephemeral:true})
-            console.log(new Date().toLocaleString() + ": " + "User " + interaction.user.username + " used command " + interaction.commandName + " unsuccessfully. The error message is: \n" + error.toString())
+            console.log(new Date().toLocaleString() + ": " + "User " + interaction.user.username + " used command " + interaction.commandName + " unsuccessfully. The error message is: \n" + error)
+        	await interaction.reply({content:"Unexpected error ocurred!\nError message is:\n**" + error + "**", ephemeral:true})
         })
     }
 }
