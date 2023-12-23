@@ -19,7 +19,7 @@ for (const file of commandFiles) {
     if ("data" in command && "execute" in command) {
         client.commands.set(command.data.name, command);
     } else {
-        console.log(new Date().toLocaleString() + "[WARNING] The command at " + filePath + " is missing a required \"data\" or \"execute\" property.");
+        console.log(new Date().toLocaleString() + ": " + "[WARNING] The command at " + filePath + " is missing a required \"data\" or \"execute\" property.");
     }
 }
 

@@ -1,5 +1,4 @@
 const { SlashCommandBuilder } = require("discord.js");
-const { time } = require("node:console");
 
 module.exports = {
     data: new SlashCommandBuilder()

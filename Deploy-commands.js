@@ -18,7 +18,7 @@ const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
 // and deploy your commands!
 (async () => {
 	try {
-		console.log(`Started refreshing ${commands.length} application (/) commands.`);
+		console.log(new Date().toLocaleString() + ": " + `Started refreshing ${commands.length} application (/) commands.`);
 
 		// The put method is used to fully refresh all commands in the guild with the current set
 		const data = await rest.put(
@@ -26,9 +26,10 @@ const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
 			{ body: commands },
 		);
 
-		console.log(`Successfully reloaded ${data.length} application (/) commands.`);
+		console.log(new Date().toLocaleString() + ": " + `Successfully reloaded ${data.length} application (/) commands.`);
 	} catch (error) {
 		// And of course, make sure you catch and log any errors!
-		console.error(error);
+		console.error(new Date().toLocaleString() + ": " + "Unexpected error occured during application command refresh!")
+		console.error(new Date().toLocaleString() + ": " + error);
 	}
 })();
