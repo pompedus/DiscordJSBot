@@ -19,7 +19,7 @@ for (const file of commandFiles) {
     if ("data" in command && "execute" in command) {
         client.commands.set(command.data.name, command);
     } else {
-        console.log("[WARNING] The command at " + filePath + " is missing a required \"data\" or \"execute\" property.");
+        console.log(new Date().toLocaleString() + "[WARNING] The command at " + filePath + " is missing a required \"data\" or \"execute\" property.");
     }
 }
 
@@ -28,15 +28,16 @@ client.on(Events.InteractionCreate, async interaction => {
 
     const command = interaction.client.commands.get(interaction.commandName);
     if (!command) {
-        console.error(`No command matching ${interaction.commandName} was found.`);
+        console.error(new Date().toLocaleString() + ": " + `No command matching ${interaction.commandName} was found.`);
         return;
     }
 
     try {
         await command.execute(interaction);
     } catch (error) {
-        console.error(error);
-        await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true })
+        console.error(new Date().toLocaleString() + ": " + "Unexpected error occured during command execution");
+        console.error(new Date().toLocaleString() + ": " + error);
+        await interaction.reply({ content: 'There was an error while executing this command!\n' + error, ephemeral: true })
     }
 });
 

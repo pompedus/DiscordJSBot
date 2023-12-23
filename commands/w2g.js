@@ -26,11 +26,14 @@ module.exports = {
                         "share": url
                     })
                 })
+                if(!response.ok){
+                    throw new Error(`${response.status}`);
+                }
                 const json = await response.json();
                 return json;
             } catch (error) {
-                console.log(new Date().toLocaleString() + ": " + "User " + interaction.user.username + " used command " + interaction.commandName + " unsuccessfully.");
-                console.log(new Date().toLocaleString() + ": " + error);
+                console.error(new Date().toLocaleString() + ": " + "User " + interaction.user.username + " used command " + interaction.commandName + " unsuccessfully.");
+                console.error(new Date().toLocaleString() + ": " + error);
                 throw error;
             }
         }
