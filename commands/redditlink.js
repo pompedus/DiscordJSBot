@@ -10,7 +10,8 @@ module.exports = {
                 .setRequired(true)),
 
     async execute(interaction) {
-        const jsonUrl = interaction.options.getString("reddit-link") + ".json";
+        const url = interaction.options.getString("reddit-link");
+        const jsonUrl = url.split('?')[0] + ".json";
         let attempts = 0;
         const maxAttempts = 5;
 
