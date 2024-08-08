@@ -1,0 +1,111 @@
+import requests
+import sys
+import re
+import json
+import threading
+import concurrent.futures
+import time
+from bs4 import BeautifulSoup
+from collections import Counter
+
+# Create a lock
+allgods_lock = threading.Lock()
+log_lock = threading.Lock()
+request_lock = threading.Lock()
+class log:
+    def info(message):
+        with log_lock:
+            print("{\"Type\":\"Info\", \"Data\":\"" + message + "\"}")
+    def result(message):
+        with log_lock:
+            print("{\"Type\":\"Result\", \"Data\":" + message + "}")
+    def error(message):
+        with log_lock:
+            print("{\"Type\":\"Error\", \"Data\":\"" + message + "\"}")
+
+def get_html(url):
+    response = requests.get(url)
+    return response.text
+
+def extract_links(html):
+    pattern = r'href="(/match/\d+)"'
+    return re.findall(pattern, html)
+
+def process_page(url, page_number, allgods):
+    html = get_html(url)
+    links = extract_links(html)
+    for link in links:
+        if page_number > 1:
+            updated_url = f"{url}?page={page_number}"
+        else:
+            updated_url = url
+        extract_alt_attrs("https://smite.guru" + link, updated_url, allgods)
+
+def extract_alt_attrs(url, profileurl, allgods):
+    startTime = time.perf_counter()
+    log.info(f"Starting fetch of: {url}")
+    mygods = []
+    html = get_html(url)
+    soup = BeautifulSoup(html, 'html.parser')
+    mydiv = soup.find('section', {'id': 'matchup', 'data-v-12f6631c': ''})
+    
+    # Check if mydiv is None
+    if mydiv is None:
+        log.error(f"Could not find the section in {url}")
+        return
+
+    div = mydiv.find_all('div', {'class': 'columns', 'data-v-12f6631c': ''}, recursive=False)
+    div = find_side(div, profileurl)
+    
+    if div is not None:
+        images = div.find_all('img')
+        for img in images:
+            if img.has_attr('alt'):
+                if img['alt'] == "":
+                    mygods.append("Unknown god")
+                else:
+                    mygods.append(img['alt'])
+
+    mygods = list(set(mygods))
+    with allgods_lock:
+        allgods.extend(mygods)
+    log.info(f"Finished fetch of {url}. It took {time.perf_counter() - startTime: 0.2f} seconds")
+
+def count_names(names_list):
+    count_dict = dict(Counter(names_list))
+    sorted_dict = dict(sorted(count_dict.items(), key=lambda item: item[1], reverse=True))
+    return sorted_dict
+
+def extract_data(url):
+    start = url.split('/profile/')[1]
+    result = start.split('/matches')[0]
+    return result
+
+def find_side(div, url):
+    del div[1]
+    for side in div:
+        if str(side).find(extract_data(url)) == -1:
+            return side
+    return ""
+
+def main():
+    allgods = []
+    if len(sys.argv) != 3:
+        log.error("Usage: python script.py <website_url> <number_of_pages>")
+        return
+
+    url = sys.argv[1]
+    pages = int(sys.argv[2])
+    currentPage = 1
+    perfTimer = {"batch": time.perf_counter()}
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+        while currentPage <= pages:
+            executor.submit(process_page, url, currentPage, allgods)
+            currentPage += 1
+
+    log.info(f"Finished fetch of batch. It took {time.perf_counter() - perfTimer['batch']: 0.2f} seconds")
+    log.result(json.dumps(count_names(allgods)))
+
+if __name__ == "__main__":
+    main()

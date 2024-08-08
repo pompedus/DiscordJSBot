@@ -40,10 +40,10 @@ module.exports = {
 
         await fetchJson(videoUrl).then(data => {
             content = "W2G: Here is your room! https://w2g.tv/rooms/" + data.streamkey;
-            interaction.reply(content);
+            interaction.editReply(content);
             console.log(new Date().toLocaleString() + ": " + "User " + interaction.user.username + " used command " + interaction.commandName + " and sent a video successfully.");
         }).catch(error => {
-            interaction.reply({ content: "Unexpected error ocurred!\n**" + error + "**", ephemeral: true })
+            interaction.editReply({ content: "Unexpected error ocurred!\n**" + error + "**", ephemeral: true })
         })
     }
 }
