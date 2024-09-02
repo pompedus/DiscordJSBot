@@ -1,11 +1,7 @@
 const { SlashCommandBuilder, ChannelType, ThreadAutoArchiveDuration } = require("discord.js");
-// Importing the OpenAI module using require
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { Anthropic } = require("@anthropic-ai/sdk")
 
-// Access your API key as an environment variable (see "Set up your API key" above)
-const genAI = new GoogleGenerativeAI(process.env.GPT_KEY);
-
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
+const anthropic = new Anthropic({apiKey: process.env.CLAUDE_KEY});
 
 function splitStringByLength(str, length) {
     let result = [];
@@ -18,40 +14,68 @@ function splitStringByLength(str, length) {
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("gpt")
-        .setDescription("Sends a question to Gemini")
+        .setDescription("Sends a question to Anthropic Claude")
         .addStringOption(option =>
             option.setName("question")
-                .setDescription("What you want to ask Gemini")
-                .setRequired(true)),
+                .setDescription("What you want to ask Claude")
+                .setRequired(true))
+        .addBooleanOption(option=>
+            option.setName("private")
+                .setDescription("Do you want this to be a private call?")
+                .setRequired(false)),
     
     async execute(interaction) {
-        await interaction.deferReply({ ephemeral: true });
+        displayName = interaction.member ? interaction.member.displayName : interaction.user.username;
+        ephemeralResponse = interaction.options.getBoolean("private") == null ? true : false
+        await interaction.deferReply({ ephemeral: ephemeralResponse });
         try{
-        const question = "Answer the following prompt in 2000 letters or less: " + interaction.options.getString("question");
+            const question = interaction.options.getString("question");
+            /*const thread = await interaction.channel.threads.create({
+                name: question,
+                autoArchiveDuration: ThreadAutoArchiveDuration.OneHour,
+                type: ChannelType.PrivateThread,
+                reason: 'Needed a separate thread for moderation',
+            });
+            if (thread.joinable) thread.join();
+            thread.members.add(interaction.user);*/
+            currentMessage = ""
+            const msg = await anthropic.messages.create({
+                model: "claude-3-5-sonnet-20240620",
+                max_tokens: 1000,
+                temperature: 0,
+                system: "Keep the response under 2000 characters.",
+                messages: [
+                    {
+                    "role": "user",
+                    "content": [
+                        {
+                        "type": "text",
+                        "text": question
+                        }
+                    ]
+                    }
+                ]
+            })
+            /*.on('text', (text) => {
+                console.log(text)
+                currentMessage += text
+                interaction.editReply({ content: currentMessage, ephemeral: ephemeralResponse })
+            })*/
+            answer = `${displayName} asked the question:\n**${question}** \n\n ${msg.content[0].text}`
 
-        /*const thread = await interaction.channel.threads.create({
-            name: question,
-            autoArchiveDuration: ThreadAutoArchiveDuration.OneHour,
-            type: ChannelType.PrivateThread,
-            reason: 'Needed a separate thread for moderation',
-        });
-        if (thread.joinable) thread.join();
-        thread.members.add(interaction.user);*/
-        const result = await model.generateContent(question);
-        const response = await result.response;
-        const text = response.text();
-        if (text.length < 2000) {
-            await interaction.editReply({ content: text, ephemeral: true })
-        } else {
-            stringlist = splitStringByLength(text, 2000)
-            for(let string of stringlist){
-                await interaction.followUp({ content: string, ephemeral: true })
+            if (answer.length < 2000) {
+                await interaction.editReply({ content: answer, ephemeral: ephemeralResponse })
+            } else {
+                stringlist = splitStringByLength(answer, 2000)
+                for(let string of stringlist){
+                    await interaction.followUp({ content: string, ephemeral: ephemeralResponse })
+                }
             }
-        }
 
-        console.log(new Date().toLocaleString() + ": " + "User " + interaction.user.username + " used command " + interaction.commandName + " and asked gemini successfully.");
+            console.log(`${new Date().toLocaleString()}: User ${displayName} used command ${interaction.commandName} and asked Claude successfully. The answer was ${answer.length} characters long.`);
         } catch (error) {
             await interaction.editReply({ content: "Unexpected error ocurred!\n**" + error + "**", ephemeral: true });
+            console.log(`${new Date().toLocaleString()}: User ${displayName} used command ${interaction.commandName} and it failed. The reason was ${error}.`);
         }
     }
 }
