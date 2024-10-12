@@ -24,12 +24,12 @@ module.exports = {
                 const json = await response.json();
                 return json;
             } catch (error) {
-                console.error(new Date().toLocaleString() + ": " + "User " + interaction.user.username + " used command " + interaction.commandName + " unsuccessfully.");
                 if (error.message === '403' && attempts < maxAttempts) {
                     attempts++;
-                    console.error(new Date().toLocaleString() + ": " + error + " - Try: " + attempts + "/" + maxAttempts + " to fetch JSON - Retrying.");
+                    console.log(new Date().toLocaleString() + ": " + error + " - Try: " + attempts + "/" + maxAttempts + " to fetch JSON - Retrying.");
                     return fetchJson(url);
                 } else {
+                    console.error(new Date().toLocaleString() + ": " + "User " + interaction.user.username + " used command " + interaction.commandName + " unsuccessfully.");
                     console.error(new Date().toLocaleString() + ": " + error);
                     throw error;
                 }
