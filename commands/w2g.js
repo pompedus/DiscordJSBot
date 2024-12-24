@@ -32,8 +32,8 @@ module.exports = {
                 const json = await response.json();
                 return json;
             } catch (error) {
-                console.error(new Date().toLocaleString() + ": " + "User " + interaction.user.username + " used command " + interaction.commandName + " unsuccessfully.");
-                console.error(new Date().toLocaleString() + ": " + error);
+                console.error(`${new Date().toLocaleString()}: User ${interaction.user.username} used command ${interaction.commandName} and sent a video unsuccessfully`);
+                console.error(`${new Date().toLocaleString()}: ${error}`);
                 throw error;
             }
         }
@@ -42,8 +42,10 @@ module.exports = {
             link = `https://w2g.tv/rooms/${data.streamkey}`
             content = `W2G: Here is your room! ${link}`;
             interaction.reply(content);
-            console.log(`${new Date().toLocaleString()} : User ${interaction.user.username} used command ${interaction.commandName} and sent a video successfully (${link}).`);
+            console.log(`${new Date().toLocaleString()}: User ${interaction.user.username} used command ${interaction.commandName} and sent a video successfully (${link}).`);
         }).catch(error => {
+            console.error(`${new Date().toLocaleString()}: User ${interaction.user.username} used command ${interaction.commandName} and sent a video unsuccessfully`);
+            console.error(`${new Date().toLocaleString()}: ${error}`);
             interaction.reply({ content: `Unexpected error ocurred!\n**${error}**`, ephemeral: true })
         })
     }

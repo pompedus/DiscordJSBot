@@ -26,7 +26,7 @@ module.exports = {
             name: "Pages checked (25 matches per page)",
             value: pages.toString()
         });
-        console.log(new Date().toLocaleString() + ": " + "Starting godlist fetch on url: " + url);
+        console.log(`${new Date().toLocaleString()}: Starting godlist fetch on url: ${url}`);
         let options = {
             mode: 'json',
             pythonOptions: ['-u'], // get print results in real-time
@@ -41,11 +41,11 @@ module.exports = {
             messageType = message.Type;
             messageData = message.Data;
             if (messageType == "Info") {
-                console.log(new Date().toLocaleString() + ": " + messageData);
+                console.log(`${new Date().toLocaleString()}: ${messageData}`);
                 correctFetch += 1;
             };
             if (messageType == "Error") {
-                console.error(new Date().toLocaleString() + ": " + messageData);
+                console.error(`${new Date().toLocaleString()}: ${messageData}`);
                 inCorrectFetch += 1;
             };
             if (messageType == "Result") {
@@ -85,16 +85,17 @@ module.exports = {
                 });
                 godEmbed.addFields({
                     name: "Matches correctly fetched",
-                    value: correctFetch.toString() + "/" + (correctFetch+inCorrectFetch).toString()
+                    value: `${correctFetch.toString()}/${(correctFetch+inCorrectFetch).toString()}`
                 })
 
                 await interaction.editReply({ embeds: [godEmbed] });
-                console.log(new Date().toLocaleString() + ": " + "User " + interaction.user.username + " used command " + interaction.commandName + " successfully.");
+                console.log(`${new Date().toLocaleString()}: User ${interaction.user.username} used command ${interaction.commandName} successfully.`);
             }
         });
         getlist.on('stderr', async (error) => {
-            await interaction.editReply({ content: "Unexpected error ocurred!\n**" + error + "**", ephemeral: true });
-            console.error(new Date().toLocaleString() + ": " + error);
+            await interaction.editReply({ content: `Unexpected error ocurred!\n**${error}**`, ephemeral: true });
+            console.error(`${new Date().toLocaleString()}: User ${interaction.user.username} used command ${interaction.commandName} unsuccessfully`);
+            console.error(`${new Date().toLocaleString()}: ${error}`);
         });
     }
 }

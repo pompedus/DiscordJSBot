@@ -26,11 +26,11 @@ module.exports = {
             } catch (error) {
                 if (error.message === '403' && attempts < maxAttempts) {
                     attempts++;
-                    console.log(`${new Date().toLocaleString()} : ${error} - Try: ${attempts}/${maxAttempts} to fetch JSON - Retrying.`);
+                    console.log(`${new Date().toLocaleString()}: ${error} - Try: ${attempts}/${maxAttempts} to fetch JSON - Retrying.`);
                     return fetchJson(url);
                 } else {
-                    console.error(`${new Date().toLocaleString()} : User ${interaction.user.username} used command ${interaction.commandName} unsuccessfully.`);
-                    console.error(`${new Date().toLocaleString()} : ${error}`);
+                    console.error(`${new Date().toLocaleString()}: User ${interaction.user.username} used command ${interaction.commandName} unsuccessfully.`);
+                    console.error(`${new Date().toLocaleString()}: ${error}`);
                     throw error;
                 }
             }
@@ -40,11 +40,11 @@ module.exports = {
             switch (data.is_video) {
                 case true:
                     interaction.reply(data.media.reddit_video.fallback_url);
-                    console.log(`${new Date().toLocaleString()} : User ${interaction.user.username} used command ${interaction.commandName} to send a video successfully. (${data.media.reddit_video.fallback_url})`);
+                    console.log(`${new Date().toLocaleString()}: User ${interaction.user.username} used command ${interaction.commandName} to send a video successfully. (${data.media.reddit_video.fallback_url})`);
                     break;
                 case false:
                     interaction.reply(data.url);
-                    console.log(`${new Date().toLocaleString()} : User ${interaction.user.username} used command ${interaction.commandName} to send a gif successfully. (${data.url})`);
+                    console.log(`${new Date().toLocaleString()}: User ${interaction.user.username} used command ${interaction.commandName} to send a gif successfully. (${data.url})`);
                     break;
             }
         }).catch(error => {

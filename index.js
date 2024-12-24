@@ -19,7 +19,7 @@ for (const file of commandFiles) {
     if ("data" in command && "execute" in command) {
         client.commands.set(command.data.name, command);
     } else {
-        console.log(new Date().toLocaleString() + ": " + "[WARNING] The command at " + filePath + " is missing a required \"data\" or \"execute\" property.");
+        console.log(`${new Date().toLocaleString()}: [WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
     }
 }
 
@@ -28,22 +28,22 @@ client.on(Events.InteractionCreate, async interaction => {
 
     const command = interaction.client.commands.get(interaction.commandName);
     if (!command) {
-        console.error(new Date().toLocaleString() + ": " + `No command matching ${interaction.commandName} was found.`);
+        console.error(`new Date().toLocaleString(): No command matching ${interaction.commandName} was found.`);
         return;
     }
     try {
         await command.execute(interaction);
     } catch (error) {
-        console.error(new Date().toLocaleString() + ": " + "Unexpected error occured during command execution");
-        console.error(new Date().toLocaleString() + ": " + error);
-        await interaction.editReply({ content: 'There was an error while executing this command!\n' + error, ephemeral: true })
+        console.error(`${new Date().toLocaleString()}: Unexpected error occured during command execution`);
+        console.error(`${new Date().toLocaleString()}: ${error}`);
+        await interaction.editReply({ content: `There was an error while executing this command!\n${error}`, ephemeral: true })
     }
 });
 
 //When the client is ready, run this code (only once)
 //We use "c" for the event parameter to keep it separate from the already defined "client"
 client.once(Events.ClientReady, c => {
-    console.log(new Date().toLocaleString() + ": " + `Ready! Logged in as ${c.user.tag}`);
+    console.log(`${new Date().toLocaleString()}: Ready! Logged in as ${c.user.tag}`);
 });
 
 //Log in to Discord with your client's token
