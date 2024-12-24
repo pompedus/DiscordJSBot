@@ -3,52 +3,65 @@ const { SlashCommandBuilder } = require("discord.js");
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("redditparse")
-        .setDescription("Extracts gif and video link from a redditlink and sends it")
+        .setDescription("Extracts gif and video link from a reddit link and sends it")
         .addStringOption(option =>
             option.setName("reddit-link")
                 .setDescription("The link to the post with the gif or video")
-                .setRequired(true)),
+                .setRequired(true)
+        ),
 
     async execute(interaction) {
         const url = interaction.options.getString("reddit-link");
-        const jsonUrl = url.split('?')[0] + ".json";
-        let attempts = 0;
+        const jsonUrl = `${url.split('?')[0]}.json`;
         const maxAttempts = 5;
 
-        async function fetchJson(url) {
+        const logInteraction = (message) => {
+            console.log(`${new Date().toLocaleString()}: User ${interaction.user.username} used command ${interaction.commandName} - ${message}`);
+        };
+
+        const logError = (error) => {
+            console.error(`${new Date().toLocaleString()}: User ${interaction.user.username} used command ${interaction.commandName} - Error: ${error.message}`);
+        };
+
+        const fetchJson = async (url, attempts = 0) => {
             try {
                 const response = await fetch(url);
                 if (!response.ok) {
                     throw new Error(`${response.status}`);
                 }
-                const json = await response.json();
-                return json;
+                return await response.json();
             } catch (error) {
                 if (error.message === '403' && attempts < maxAttempts) {
-                    attempts++;
-                    console.log(new Date().toLocaleString() + ": " + error + " - Try: " + attempts + "/" + maxAttempts + " to fetch JSON - Retrying.");
-                    return fetchJson(url);
+                    logInteraction(`${error.message} - Retry ${attempts + 1}/${maxAttempts}`);
+                    return fetchJson(url, attempts + 1);
                 } else {
-                    console.error(new Date().toLocaleString() + ": " + "User " + interaction.user.username + " used command " + interaction.commandName + " unsuccessfully.");
-                    console.error(new Date().toLocaleString() + ": " + error);
+                    logError(error);
                     throw error;
                 }
             }
-        }
-        await fetchJson(jsonUrl).then(json => {
-            var data = json[0].data.children[0].data
-            switch (data.is_video) {
-                case true:
-                    interaction.reply(data.media.reddit_video.fallback_url);
-                    console.log(new Date().toLocaleString() + ": " + "User " + interaction.user.username + " used command " + interaction.commandName + " to send a video successfully.");
-                    break;
-                case false:
-                    interaction.reply(data.url);
-                    console.log(new Date().toLocaleString() + ": " + "User " + interaction.user.username + " used command " + interaction.commandName + " to send a gif successfully.");
-                    break;
+        };
+
+        try {
+            const json = await fetchJson(jsonUrl);
+            const data = json[0]?.data?.children[0]?.data;
+
+            if (!data) {
+                throw new Error("Invalid data structure");
             }
-        }).catch(error => {
-            interaction.reply({ content: "Unexpected error ocurred!\n**" + error + "**", ephemeral: true });
-        })
+
+            if (data.is_video) {
+                await interaction.reply(data.media.reddit_video.fallback_url);
+                logInteraction("successfully sent a video link");
+            } else {
+                await interaction.reply(data.url);
+                logInteraction("successfully sent a gif link");
+            }
+        } catch (error) {
+            logError(error);
+            await interaction.reply({
+                content: `Unexpected error occurred!\n**${error.message}**`,
+                ephemeral: true
+            });
+        }
     }
-}
+};
