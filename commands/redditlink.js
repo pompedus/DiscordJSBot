@@ -51,10 +51,10 @@ module.exports = {
 
             if (data.is_video) {
                 await interaction.reply(data.media.reddit_video.fallback_url);
-                logInteraction("successfully sent a video link");
+                logInteraction(`successfully sent a video link (${data.media.reddit_video.fallback_url})`);
             } else {
                 await interaction.reply(data.url);
-                logInteraction("successfully sent a gif link");
+                logInteraction(`successfully sent a gif link${data.url}`);
             }
         } catch (error) {
             logError(error);
