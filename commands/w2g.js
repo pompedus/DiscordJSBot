@@ -42,7 +42,7 @@ module.exports = {
             link = `https://w2g.tv/rooms/${data.streamkey}`
             content = `W2G: Here is your room! ${link}`;
             interaction.reply(content);
-            console.log(`${new Date().toLocaleString()}: User ${interaction.user.username} used command ${interaction.commandName} and sent a video successfully (${link}).`);
+            console.log(`${new Date().toLocaleString()}: User ${interaction.user.username} used command ${interaction.commandName} and sent a video successfully (${videoUrl}).`);
         }).catch(error => {
             console.error(`${new Date().toLocaleString()}: User ${interaction.user.username} used command ${interaction.commandName} and sent a video unsuccessfully`);
             console.error(`${new Date().toLocaleString()}: ${error}`);
