@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require("discord.js");
+const { SlashCommandBuilder, MessageFlags } = require("discord.js");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -48,7 +48,7 @@ module.exports = {
                     break;
             }
         }).catch(error => {
-            interaction.reply({ content: `Unexpected error ocurred!\n**${error}**`, ephemeral: true });
+            interaction.reply({ content: `Unexpected error ocurred!\n**${error}**`, flags: MessageFlags.Ephemeral });
         })
     }
 }

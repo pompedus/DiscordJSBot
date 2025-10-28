@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder, MessageFlags } = require("discord.js");
 const { PythonShell } = require('python-shell');
 
 module.exports = {
@@ -93,7 +93,7 @@ module.exports = {
             }
         });
         getlist.on('stderr', async (error) => {
-            await interaction.editReply({ content: `Unexpected error ocurred!\n**${error}**`, ephemeral: true });
+            await interaction.editReply({ content: `Unexpected error ocurred!\n**${error}**`, flags: MessageFlags.Ephemeral });
             console.error(`${new Date().toLocaleString()}: User ${interaction.user.username} used command ${interaction.commandName} unsuccessfully`);
             console.error(`${new Date().toLocaleString()}: ${error}`);
         });
