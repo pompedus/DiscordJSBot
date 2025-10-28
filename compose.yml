@@ -1,6 +1,6 @@
 services:
   discord-bot:
-    image: discordjsbot:latest
+    image: pompedus/discordjsbot:latest
     restart: unless-stopped
     environment:
       DISCORD_TOKEN: ${DISCORD_TOKEN}
