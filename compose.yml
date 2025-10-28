@@ -7,7 +7,3 @@ services:
       DISCORD_TOKEN: ${DISCORD_TOKEN}
       W2G_TOKEN: ${W2G_TOKEN}
       TZ: Europe/Stockholm
-    # If you want to run as your homelab UID/GID 568:
-    # user: "568:568"
-    # volumes:
-    #   - ./data:/app/data
