@@ -1,7 +1,6 @@
 services:
   discord-bot:
-    build: .
-    image: my-discord-bot:latest
+    image: discordjsbot:latest
     restart: unless-stopped
     environment:
       DISCORD_TOKEN: ${DISCORD_TOKEN}
