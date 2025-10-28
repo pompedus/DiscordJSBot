@@ -1,0 +1,9 @@
+services:
+  discord-bot:
+    build: .
+    image: my-discord-bot:latest
+    restart: unless-stopped
+    environment:
+      DISCORD_TOKEN: ${DISCORD_TOKEN}
+      W2G_TOKEN: ${W2G_TOKEN}
+      TZ: Europe/Stockholm
