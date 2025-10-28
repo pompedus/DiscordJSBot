@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require("discord.js");
+const { SlashCommandBuilder, MessageFlags } = require("discord.js");
 require('dotenv').config();
 
 module.exports = {
@@ -46,7 +46,7 @@ module.exports = {
         }).catch(error => {
             console.error(`${new Date().toLocaleString()}: User ${interaction.user.username} used command ${interaction.commandName} and sent a video unsuccessfully`);
             console.error(`${new Date().toLocaleString()}: ${error}`);
-            interaction.reply({ content: `Unexpected error ocurred!\n**${error}**`, ephemeral: true })
+            interaction.reply({ content: `Unexpected error ocurred!\n**${error}**`, flags: MessageFlags.Ephemeral })
         })
     }
 }

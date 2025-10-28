@@ -1,7 +1,7 @@
 //Require the necessaru discord.js classes
 const fs = require("node:fs");
 const path = require("node:path");
-const { Client, Events, GatewayIntentBits, Collection } = require("discord.js");
+const { Client, Events, GatewayIntentBits, Collection, MessageFlags } = require("discord.js");
 require('dotenv').config();
 
 //Create a new client instance
@@ -36,7 +36,7 @@ client.on(Events.InteractionCreate, async interaction => {
     } catch (error) {
         console.error(`${new Date().toLocaleString()}: Unexpected error occured during command execution`);
         console.error(`${new Date().toLocaleString()}: ${error}`);
-        await interaction.editReply({ content: `There was an error while executing this command!\n${error}`, ephemeral: true })
+        await interaction.editReply({ content: `There was an error while executing this command!\n${error}`, flags: MessageFlags.Ephemeral})
     }
 });
 
